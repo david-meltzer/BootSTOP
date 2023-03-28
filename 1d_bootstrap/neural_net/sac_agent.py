@@ -12,6 +12,8 @@ from neural_net.sac_networks import ActorNetwork, CriticNetwork, ValueNetwork
 # random.seed(0)
 # np.random.seed(0)
 
+#test commit
+
 def weights_init(m):
     if isinstance(m, nn.Linear):
         nn.init.uniform_(m.weight.data)
