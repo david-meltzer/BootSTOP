@@ -1,23 +1,23 @@
 import sys
-from parameters import ParametersSixD_SAC
-from environment.blocks import CrossingSixD_SAC
+from parameters import Parameters1D_SAC
+from environment.blocks import Crossing1D_SAC
 from environment.data_z_sample import ZData
 import environment.utils as utils
 from neural_net.sac import soft_actor_critic
 
 if __name__ == '__main__':
     # ---Instantiating some relevant classes---
-    params = ParametersSixD_SAC()
+    params = Parameters1D_SAC()
     zd = ZData()
 
     # ---Kill portion of the z-sample data if required---
     zd.kill_data(params.z_kill_list)
 
     # ---Load the pre-generated conformal blocks for long multiplets---
-    blocks = utils.generate_block_list(max(params.spin_list_long), params.z_kill_list)
+    blocks = utils.generate_block_list(params.z_kill_list)
 
     # ---Instantiate the crossing_eqn class---
-    cft = CrossingSixD_SAC(blocks, params, zd)
+    cft = Crossing1D_SAC(blocks, params, zd)
 
     # array_index is the cluster array number passed to the console. Set it to zero if it doesn't exist.
     try:

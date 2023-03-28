@@ -7,14 +7,6 @@ class Parameters1D:
 
     Attributes
     ----------
-    inv_c_charge : float
-        The inverse central charge of the CFT. It can be set to 0 corresponding to the supergravity limit.
-    spin_list_short_d : ndarray
-        A NumPy array containing either [0] if the D[0,4] multiplet is present or [] if it isn't.
-        No other values should be used.
-    spin_list_short_b : ndarray
-        A NumPy array containing a list of the B[0,2] multiplet spins. These must be even and given in increasing
-        order without duplication.
     spin_list_long : ndarray
         A NumPy array containing a list of the L[0,0] long multiplet spins. These must be even and given in increasing
         order. Degeneracy of spins is allowed.
@@ -32,19 +24,19 @@ class Parameters1D:
 
         # ---Spin partition---
         # Note: spins HAVE to be given in ascending order
-        self.spin_list_short_d = np.array([0])  # This can only be [] or [0]
-        self.spin_list_short_b = np.array([2, 4, 6, 8, 10, 12, 14, 16, 18])  # This cannot be empty
-        self.spin_list_long = np.array([0, 0, 0, 0, 0, 0, 0, 0,
-                                        2, 2, 2, 2, 2, 2, 2,
-                                        4, 4, 4, 4, 4, 4,
-                                        6, 6, 6, 6, 6,
-                                        8, 8, 8, 8,
-                                        10, 10, 10,
-                                        12, 12])  # This cannot be empty but can have repeated entries
-        self.ell_max = 30  # Spin cutoff for the a_chi function in blocks.py. This MUST be an even number
-
-        # ---Pre-generated conformal block lattice parameters---
-        self.delta_start = np.array([5.8, 7.8, 9.8, 11.8, 13.8, 15.8, 17.8, 19.8])  # lower bounds
+        #self.spin_list_short_d = np.array([0])  # This can only be [] or [0]
+        #self.spin_list_short_b = np.array([2, 4, 6, 8, 10, 12, 14, 16, 18])  # This cannot be empty
+        #self.spin_list_long = np.array([0, 0, 0, 0, 0, 0, 0, 0,
+        #                                2, 2, 2, 2, 2, 2, 2,
+        #                                4, 4, 4, 4, 4, 4,
+        #                                6, 6, 6, 6, 6,
+        #                                8, 8, 8, 8,
+        #                                10, 10, 10,
+        #                                12, 12])  # This cannot be empty but can have repeated entries
+        #self.ell_max = 30  # Spin cutoff for the a_chi function in blocks.py. This MUST be an even number
+#
+#        # ---Pre-generated conformal block lattice parameters---
+        self.delta_start = 0  # lower bounds
         self.delta_sep = 0.0005  # jump in weights between each lattice point
         self.delta_end_increment = 30.0  # maximum deltas are delta_start + delta_end_increment - delta_sep eg 35.7995
 
@@ -62,21 +54,15 @@ class Parameters1D:
 
         # DO NOT CHANGE ANYTHING BEYOND THIS POINT IN THIS CLASS
         # ---Non-User Adjustable Parameters---
-        self.num_of_operators_short_d = self.spin_list_short_d.size  # counts the number of D multiplet spins
-        self.num_of_operators_short_b = self.spin_list_short_b.size  # counts the number of B multiplet spins
+        #self.num_of_operators_short_d = self.spin_list_short_d.size  # counts the number of D multiplet spins
+        #self.num_of_operators_short_b = self.spin_list_short_b.size  # counts the number of B multiplet spins
         self.num_of_operators_long = self.spin_list_long.size  # counts the number of long multiplet spins
-        self.spin_list_short = np.concatenate((self.spin_list_short_d, self.spin_list_short_b))
-        self.spin_list = np.concatenate((self.spin_list_short_d, self.spin_list_short_b,
-                                         self.spin_list_long))
-        self.multiplet_index = [np.arange(self.num_of_operators_short_d),
-                                np.arange(self.num_of_operators_short_d,
-                                          (self.num_of_operators_short_b + self.num_of_operators_short_d)),
-                                np.arange((self.num_of_operators_short_b + self.num_of_operators_short_d),
-                                          (self.num_of_operators_short_b + self.num_of_operators_short_d
-                                           + self.num_of_operators_long))]
+        #self.spin_list_short = np.concatenate((self.spin_list_short_d, self.spin_list_short_b))
+        #self.spin_list = self.spin_list_long
+        #self.multiplet_index = [np.arange(self.num_of_operators_long)]
 
 
-class ParametersSixD_SAC(ParametersSixD):
+class Parameters1D_SAC(ParametersSixD):
     """
     A subclass of ParametersSixD. It holds the parameters required to configure the soft-Actor-Critic algorithm.
 
@@ -171,89 +157,25 @@ class ParametersSixD_SAC(ParametersSixD):
 
         # ---Environment Parameters---
         # set guessing run list for conformal weights
-        self.guessing_run_list_deltas = np.array([0,
-                                                  0, 0, 0, 0, 0, 0, 0, 0, 0,
-                                                  1, 1, 1, 1, 1, 1, 1, 1,
-                                                  1, 1, 1, 1, 1, 1, 1,
-                                                  1, 1, 1, 1, 1, 1,
-                                                  1, 1, 1, 1, 1,
-                                                  1, 1, 1, 1,
-                                                  1, 1, 1,
-                                                  1, 1], dtype=bool)
+        self.guessing_run_list_deltas = np.array([1, 1, 1, 1, 1, 1, 1, 1], dtype=bool)
         # set guessing run list for ope coefficients
-        self.guessing_run_list_opes = np.array([1,
-                                                1, 1, 1, 1, 1, 1, 1, 1, 1,
-                                                1, 1, 1, 1, 1, 1, 1, 1,
-                                                1, 1, 1, 1, 1, 1, 1,
-                                                1, 1, 1, 1, 1, 1,
-                                                1, 1, 1, 1, 1,
-                                                1, 1, 1, 1,
-                                                1, 1, 1,
-                                                1, 1], dtype=bool)
+        self.guessing_run_list_opes = np.array([1, 1, 1, 1, 1, 1, 1, 1], dtype=bool)
         # initial search window size for conformal weights
         # windows for D and B multiplets should be set to zero as they are fixed
-        self.guess_sizes_deltas = np.array([0.0,
-                                            0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
-                                            10.0, 10.0, 10.0, 10.0, 10.0, 10.0, 10.0, 10.0,
-                                            10.0, 10.0, 10.0, 10.0, 10.0, 10.0, 10.0,
-                                            10.0, 10.0, 10.0, 10.0, 10.0, 10.0,
-                                            10.0, 10.0, 10.0, 10.0, 10.0,
-                                            10.0, 10.0, 10.0, 10.0,
-                                            10.0, 10.0, 10.0,
-                                            10.0, 10.0])
+        self.guess_sizes_deltas = np.array([10.0, 10.0, 10.0, 10.0, 10.0, 10.0, 10.0, 10.0])
         # initial search window size for OPE coeffs
-        self.guess_sizes_opes = np.array([20,
-                                          20, 20, 20, 20, 20, 20, 20, 20, 20,
-                                          20, 20, 20, 20, 20, 20, 20, 20,
-                                          20, 20, 20, 20, 20, 20, 20,
-                                          20, 20, 20, 20, 20, 20,
-                                          20, 20, 20, 20, 20,
-                                          20, 20, 20, 20,
-                                          20, 20, 20,
-                                          20, 20])
+        self.guess_sizes_opes = np.array([20, 20, 20, 20, 20, 20, 20, 20])
         # set minimum values for conformal weights
         # minimums for D and B multiplets are fixed as weights are known
-        self.shifts_deltas = np.array([8.0,
-                                       9.0, 11.0, 13.0, 15.0, 17.0, 19.0, 21.0, 23.0, 25.0,
-                                       6.1, 6.1, 6.1, 6.1, 6.1, 6.1, 6.1, 6.1,
-                                       8.1, 8.1, 8.1, 8.1, 8.1, 8.1, 8.1,
-                                       10.1, 10.1, 10.1, 10.1, 10.1, 10.1,
-                                       12.1, 12.1, 12.1, 12.1, 12.1,
-                                       14.1, 14.1, 14.1, 14.1,
-                                       16.1, 16.1, 16.1,
-                                       18.1, 18.1])
+        self.shifts_deltas = np.array([6.1, 6.1, 6.1, 6.1, 6.1, 6.1, 6.1, 6.1])
         # set minimum values for OPE coeffs
-        self.shifts_opecoeffs = np.array([0,
-                                          0, 0, 0, 0, 0, 0, 0, 0, 0,
-                                          0, 0, 0, 0, 0, 0, 0, 0,
-                                          0, 0, 0, 0, 0, 0, 0,
-                                          0, 0, 0, 0, 0, 0,
-                                          0, 0, 0, 0, 0,
-                                          0, 0, 0, 0,
-                                          0, 0, 0,
-                                          0, 0])
+        self.shifts_opecoeffs = np.array([0, 0, 0, 0, 0, 0, 0, 0])
 
         # ---Starting Point Parameters---
         # initial configuration to explore around
         # set equal to combination of shifts_deltas and shifts_opecoeffs to effectively start from a zero solution
-        self.global_best = np.array([8.0,
-                                     9.0, 11.0, 13.0, 15.0, 17.0, 19.0, 21.0, 23.0, 25.0,
-                                     6.1, 6.1, 6.1, 6.1, 6.1, 6.1, 6.1, 6.1,
-                                     8.1, 8.1, 8.1, 8.1, 8.1, 8.1, 8.1,
-                                     10.1, 10.1, 10.1, 10.1, 10.1, 10.1,
-                                     12.1, 12.1, 12.1, 12.1, 12.1,
-                                     14.1, 14.1, 14.1, 14.1,
-                                     16.1, 16.1, 16.1,
-                                     18.1, 18.1,
-                                     0,
-                                     0, 0, 0, 0, 0, 0, 0, 0, 0,
-                                     0, 0, 0, 0, 0, 0, 0, 0,
-                                     0, 0, 0, 0, 0, 0, 0,
-                                     0, 0, 0, 0, 0, 0,
-                                     0, 0, 0, 0, 0,
-                                     0, 0, 0, 0,
-                                     0, 0, 0,
-                                     0, 0])
+        self.global_best = np.array([6.1, 6.1, 6.1, 6.1, 6.1, 6.1, 6.1, 6.1,
+                                     0, 0, 0, 0, 0, 0, 0, 0])
         # initial reward to start with
         # set equal to 0.0 to start from a zero solution.
         self.global_reward_start = 0.0
@@ -262,8 +184,7 @@ class ParametersSixD_SAC(ParametersSixD):
         # DO NOT CHANGE ANYTHING BEYOND THIS POINT IN THIS CLASS
         # ------------------------------------------------------
         # ---Non-User Adjustable Parameters---
-        self.action_space_N = 2 * (self.num_of_operators_short_d + self.num_of_operators_short_b) \
-                              + 2 * self.num_of_operators_long
+        self.action_space_N = 2 * self.num_of_operators_long
         self.shifts = np.concatenate((self.shifts_deltas, self.shifts_opecoeffs))
         self.guessing_run_list = np.concatenate((self.guessing_run_list_deltas,
                                                  self.guessing_run_list_opes))

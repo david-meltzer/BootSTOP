@@ -20,8 +20,6 @@ class Crossing1D:
 
     def __init__(self, block_list, params, z_data):
         
-        self.inv_c_charge = params.inv_c_charge
-        
         self.action_space_N = params.action_space_N
 
         self.delta_sep = params.delta_sep
@@ -37,7 +35,7 @@ class Crossing1D:
 
     def long_cons(self, delta):
         """
-        Computes the (pregenerated) contribution to the crossing equation of a single spin long multiplet for all
+        Computes the (pregenerated) contribution to the crossing equation of a single block for all
         points in the z-sample simultaneously.
 
         Parameters
@@ -80,7 +78,7 @@ class Crossing1D_SAC(Crossing1D):
 
         self.same_spin_hierarchy_deltas = params.same_spin_hierarchy  # impose weight separation flag
         self.dyn_shift = params.dyn_shift  # the weight separation value
-        self.dup_list = self.spin_list_long == np.roll(self.spin_list_long, -1)  # which long spins are degenerate
+        #self.dup_list = self.spin_list_long == np.roll(self.spin_list_long, -1)  # which long spins are degenerate
 
     def split_cft_data(self, cft_data):
         """
@@ -100,14 +98,10 @@ class Crossing1D_SAC(Crossing1D):
 
         """
         delta_dict = {
-            "short_d": cft_data[self.multiplet_index[0]],
-            "short_b": cft_data[self.multiplet_index[1]],
-            "long": cft_data[self.multiplet_index[2]]
+            "long": cft_data[self.multiplet_index[0]]
         }
         ope_dict = {
-            "short_d": cft_data[self.multiplet_index[0] + self.action_space_N // 2],
-            "short_b": cft_data[self.multiplet_index[1] + self.action_space_N // 2],
-            "long": cft_data[self.multiplet_index[2] + self.action_space_N // 2]
+            "long": cft_data[self.multiplet_index[0] + self.action_space_N // 2]
         }
         return delta_dict, ope_dict
 
@@ -174,22 +168,13 @@ class Crossing1D_SAC(Crossing1D):
             # since we've altered some data we update the long multiplet weights in cft_data
             cft_data[self.multiplet_index[2]] = delta_dict['long']
 
-        if len(delta_dict['short_d']) == 0:
-            # broadcast a zero ope coefficient over the crossing contributions
-            short_cons_d_multiplet = 0 * self.SHORT_D_HYPERS
-        else:
-            # broadcast the D multiplet ope coefficient over the crossing contributions
-            short_cons_d_multiplet = ope_dict['short_d'] * self.SHORT_D_HYPERS
-
-        # broadcast the reshaped B multiplet ope coefficients over their crossing contributions
-        short_cons_b_multiplet = ope_dict['short_b'].reshape(-1, 1) * self.SHORT_B_HYPERS
         # broadcast the reshaped long multiplet ope coefficients over their crossing contributions
         long_cons = ope_dict['long'].reshape(-1, 1) * self.long_coeffs_array(delta_dict['long'])
         # long_cons.shape = (num_of_long, env_shape)
 
         # add up all the components
-        constraints = self.INHO_VALUE + short_cons_d_multiplet + short_cons_b_multiplet.sum(axis=0) \
-                      + long_cons.sum(axis=0)  # the .sum implements summation over multiplet spins
+        constraints = self.INHO_VALUE + long_cons.sum(axis=0)  
+        # the .sum implements summation over multiplet spins
         reward = 1 / LA.norm(constraints)
 
         return constraints, reward, cft_data
